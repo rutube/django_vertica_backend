@@ -1,6 +1,8 @@
 # coding: utf-8
 
 # $Id: $
+from django import VERSION
+
 import mock
 from django.db.models import Sum
 from django.test import TestCase
@@ -75,7 +77,9 @@ class VerticaBackendTestCase(TestCase):
         query = ('SELECT "reports_platformreport"."platform_id", '
                  'SUM("reports_platformreport"."video_views") AS "video_views" '
                  'FROM "reports_platformreport" '
-                 'WHERE "reports_platformreport"."date" >= %s '
-                 'GROUP BY "reports_platformreport"."platform_id" '
-                 'LIMIT 400 OFFSET 100')
+                 'WHERE "reports_platformreport"."date" >= %s ')
+        if VERSION < (1, 7, 0):
+            query += ' '
+        query += ('GROUP BY "reports_platformreport"."platform_id" '
+                  'LIMIT 400 OFFSET 100')
         self.cursor_mock.execute.assert_called_with(query, (u'2014-09-15',))

@@ -5,6 +5,7 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 import sys
+from django.db.backends.creation import BaseDatabaseCreation
 from django.utils import timezone
 from django.utils.six import text_type, binary_type
 
@@ -18,43 +19,41 @@ except ImportError:
 from django.db import utils
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseValidation, \
     BaseDatabaseOperations, BaseDatabaseClient, BaseDatabaseIntrospection
-from django.db.backends.signals import connection_created
 from django.conf import settings
 from django import VERSION
 
 if VERSION >= (1, 7, 0):
-    from django.db.backends.creation import BaseDatabaseCreation
     from django.db.backends.schema import BaseDatabaseSchemaEditor
-
-    class DatabaseCreation(BaseDatabaseCreation):
-        data_types = {
-            'AutoField': 'identity',
-            'BinaryField': 'longblob',
-            'BooleanField': 'bool',
-            'CharField': 'varchar(%(max_length)s)',
-            'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-            'DateField': 'date',
-            'DateTimeField': 'datetime',
-            'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
-            'FileField': 'varchar(%(max_length)s)',
-            'FilePathField': 'varchar(%(max_length)s)',
-            'FloatField': 'double precision',
-            'IntegerField': 'integer',
-            'BigIntegerField': 'bigint',
-            'IPAddressField': 'char(15)',
-            'GenericIPAddressField': 'char(39)',
-            'NullBooleanField': 'bool',
-            'OneToOneField': 'integer',
-            'PositiveIntegerField': 'integer',
-            'PositiveSmallIntegerField': 'smallint',
-            'SlugField': 'varchar(%(max_length)s)',
-            'SmallIntegerField': 'smallint',
-            'TextField': 'longtext',
-            'TimeField': 'time',
-        }
 
     class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         pass
+
+class DatabaseCreation(BaseDatabaseCreation):
+    data_types = {
+        'AutoField': 'identity',
+        'BinaryField': 'longblob',
+        'BooleanField': 'bool',
+        'CharField': 'varchar(%(max_length)s)',
+        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+        'DateField': 'date',
+        'DateTimeField': 'datetime',
+        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'FileField': 'varchar(%(max_length)s)',
+        'FilePathField': 'varchar(%(max_length)s)',
+        'FloatField': 'double precision',
+        'IntegerField': 'integer',
+        'BigIntegerField': 'bigint',
+        'IPAddressField': 'char(15)',
+        'GenericIPAddressField': 'char(39)',
+        'NullBooleanField': 'bool',
+        'OneToOneField': 'integer',
+        'PositiveIntegerField': 'integer',
+        'PositiveSmallIntegerField': 'smallint',
+        'SlugField': 'varchar(%(max_length)s)',
+        'SmallIntegerField': 'smallint',
+        'TextField': 'longtext',
+        'TimeField': 'time',
+    }
 
 
 
@@ -241,8 +240,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
-        if VERSION >= (1, 7, 0):
-            self.creation = DatabaseCreation(self)
+        self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation(self)
 
