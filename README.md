@@ -2,6 +2,7 @@ Django Vertica Backend
 ======================
 
 A proof-of-concept for connecting Django ORM to HP Vertica database.
+
 [![Build Status](https://travis-ci.org/tumb1er/django_vertica_backend.svg?branch=master)](https://travis-ci.org/tumb1er/django_vertica_backend)
 
 ODBC setup
