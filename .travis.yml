@@ -7,6 +7,8 @@ env:
   - DJANGO_VERSION=1.7.0
 
 # command to install dependencies
-install: pip install pyodbc Django==$DJANGO_VERSION --use-mirrors
+install:
+  - pip install pyodbc --allow-external pyodbc --use-mirrors
+  - pip install Django==$DJANGO_VERSION --use-mirrors
 # command to run tests
 script:  python manage.py test test_app
