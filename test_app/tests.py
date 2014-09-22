@@ -23,6 +23,14 @@ class VerticaTestRunner(DjangoTestSuiteRunner):
 
 
 class VerticaBackendTestCase(TestCase):
+
+
+    def _fixture_setup(self):
+        pass
+
+    def _fixture_teardown(self):
+        pass
+
     def setUp(self):
         self.cursor_mock = mock.MagicMock()
         self.connect_patcher = mock.patch.object(Database, 'connect')
