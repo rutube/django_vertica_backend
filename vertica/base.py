@@ -5,8 +5,6 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 import sys
-from django.db.backends.creation import BaseDatabaseCreation, NO_DB_ALIAS
-from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.utils import timezone
 from django.utils.six import text_type, binary_type
 
@@ -23,6 +21,42 @@ from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDa
 from django.db.backends.signals import connection_created
 from django.conf import settings
 from django import VERSION
+
+if VERSION >= (1, 7, 0):
+    from django.db.backends.creation import BaseDatabaseCreation
+    from django.db.backends.schema import BaseDatabaseSchemaEditor
+
+    class DatabaseCreation(BaseDatabaseCreation):
+        data_types = {
+            'AutoField': 'identity',
+            'BinaryField': 'longblob',
+            'BooleanField': 'bool',
+            'CharField': 'varchar(%(max_length)s)',
+            'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
+            'DateField': 'date',
+            'DateTimeField': 'datetime',
+            'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+            'FileField': 'varchar(%(max_length)s)',
+            'FilePathField': 'varchar(%(max_length)s)',
+            'FloatField': 'double precision',
+            'IntegerField': 'integer',
+            'BigIntegerField': 'bigint',
+            'IPAddressField': 'char(15)',
+            'GenericIPAddressField': 'char(39)',
+            'NullBooleanField': 'bool',
+            'OneToOneField': 'integer',
+            'PositiveIntegerField': 'integer',
+            'PositiveSmallIntegerField': 'smallint',
+            'SlugField': 'varchar(%(max_length)s)',
+            'SmallIntegerField': 'smallint',
+            'TextField': 'longtext',
+            'TimeField': 'time',
+        }
+
+    class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+        pass
+
+
 
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
@@ -45,37 +79,9 @@ class DatabaseClient(BaseDatabaseClient):
     pass
 
 
-class DatabaseCreation(BaseDatabaseCreation):
-    data_types = {
-        'AutoField': 'identity',
-        'BinaryField': 'longblob',
-        'BooleanField': 'bool',
-        'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
-        'DateField': 'date',
-        'DateTimeField': 'datetime',
-        'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
-        'FileField': 'varchar(%(max_length)s)',
-        'FilePathField': 'varchar(%(max_length)s)',
-        'FloatField': 'double precision',
-        'IntegerField': 'integer',
-        'BigIntegerField': 'bigint',
-        'IPAddressField': 'char(15)',
-        'GenericIPAddressField': 'char(39)',
-        'NullBooleanField': 'bool',
-        'OneToOneField': 'integer',
-        'PositiveIntegerField': 'integer',
-        'PositiveSmallIntegerField': 'smallint',
-        'SlugField': 'varchar(%(max_length)s)',
-        'SmallIntegerField': 'smallint',
-        'TextField': 'longtext',
-        'TimeField': 'time',
-    }
-
-
-
 class DatabaseValidation(BaseDatabaseValidation):
     pass
+
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_table_list(self, cursor):
@@ -83,9 +89,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         query = ("SELECT table_name FROM v_catalog.tables")
         cursor.execute(query)
         return [row[0] for row in cursor.fetchall()]
-
-class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-    pass
 
 
 class CursorWrapper(object):
@@ -238,19 +241,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.features = DatabaseFeatures(self)
         self.ops = DatabaseOperations(self)
         self.client = DatabaseClient(self)
-        self.creation = DatabaseCreation(self)
+        if VERSION >= (1, 7, 0):
+            self.creation = DatabaseCreation(self)
         self.introspection = DatabaseIntrospection(self)
         self.validation = DatabaseValidation(self)
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
-            if self.alias != NO_DB_ALIAS:
-                from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured(
-                    "settings.DATABASES is improperly configured. "
-                    "Please supply the NAME value.")
-            settings_dict['NAME'] = ''
+            from django.core.exceptions import ImproperlyConfigured
+            raise ImproperlyConfigured(
+                "settings.DATABASES is improperly configured. "
+                "Please supply the NAME value.")
         conn_params = {
             'database': settings_dict['NAME'],
         }
