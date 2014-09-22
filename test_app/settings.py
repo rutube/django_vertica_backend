@@ -47,10 +47,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'django_vertica_backend.urls'
-
-WSGI_APPLICATION = 'django_vertica_backend.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -64,11 +60,7 @@ DATABASES = {
         'OPTIONS': {
             'DRIVER': 'HPVertica',
         },
-
-    },
-    'TEST': {
-            'NAME': 'vertica_db_name'
-        }
+    }
 }
 
 # Internationalization
@@ -91,3 +83,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGGING= {}
+
+TEST_RUNNER = 'test_app.tests.VerticaTestRunner'
