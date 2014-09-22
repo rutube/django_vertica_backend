@@ -14,13 +14,17 @@ ODBC setup
     ErrorMessagesPath=/opt/vertica/lib64
     LogLevel=4
     LogPath=/tmp
+    
     ```
+    
 2. configure odbc instances in `/etc/odbcinst.ini`
     ```ini
     [HPVertica]
     Description = HP Vertica ODBC Driver
     Driver = /opt/vertica/lib64/libverticaodbc.so
+    
     ```
+    
 3. configure odbc data source in `/etc/odbc.ini`
     ```ini
     [ODBC Data Sources]
@@ -38,12 +42,23 @@ ODBC setup
     
     [ODBC]
     Threading = 1
+    
     ```
     
 4. check in console:
-    ```shell
+    ```bash
     $> isql -v VerticaDB
+    +---------------------------------------+
+    | Connected!                            |
+    |                                       |
+    | sql-statement                         |
+    | help [tablename]                      |
+    | quit                                  |
+    |                                       |
+    +---------------------------------------+
+
     ```
+    
 5. connect with pyodbc:
     ```python
     >>> import pyodbc
