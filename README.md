@@ -64,7 +64,10 @@ ODBC setup
     >>> import pyodbc
     >>> pyodbc.connect("DRIVER=HPVertica;HOST=localhost;PORT=5433;DATABASE=")
     <pyodbc.Connection object at 0x7f98991d02d0>
+  
     ```
+    
+6.  now it works in core python ;)
     
 Current status
 --------------
@@ -94,4 +97,15 @@ Installation
     }
     ```
 
+Example
+-------
 
+```python
+from django.db.models import Sum
+from test_app.models import PlatformReport
+
+qs = PlatformReport.objects.filter(date__gte='2014-09-15')
+qs = qs.values('platform_id')
+qs = qs.annotate(video_views = Sum('video_views'))
+print qs[100:500]
+```
