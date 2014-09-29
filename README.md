@@ -28,6 +28,7 @@ Installation
         'PASSWORD': 'password'
       }
     }
+    
     ```
 
 Example
