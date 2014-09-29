@@ -6,12 +6,10 @@ env:
   - DJANGO_VERSION=1.6.5
   - DJANGO_VERSION=1.7.0
 
-before_install:
-  - sudo apt-get install -qq unixodbc-dev
-
 # command to install dependencies
 install:
-  - pip install pyodbc --allow-external pyodbc --allow-unverified pyodbc --use-mirrors
+  - pip install -r requires.txt --use-mirrors
   - pip install Django==$DJANGO_VERSION --use-mirrors
+
 # command to run tests
 script:  python manage.py test test_app
