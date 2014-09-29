@@ -10,7 +10,7 @@ setup(
     author_email='zimbler@gmail.com',
     description='Vertica backend for Django',
     install_requires=[
-        'pyodbc'
+        'vertica-python'
     ]
 
 )

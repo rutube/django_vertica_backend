@@ -54,12 +54,11 @@ MIDDLEWARE_CLASSES = (
 DATABASES = {
     'default': {
         'ENGINE': 'vertica',
-        'NAME': 'dash',
+        'NAME': 'vertica_db',
         'HOST': 'localhost',
         'PORT': 5433,
-        'OPTIONS': {
-            'DRIVER': 'HPVertica',
-        },
+        'USER': 'dbadmin',
+        'PASSWORD': 'password'
     }
 }
 

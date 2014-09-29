@@ -10,11 +10,10 @@ from django.utils import timezone
 from django.utils.six import text_type, binary_type
 
 try:
-    import pyodbc as Database
+    import vertica_python as Database
 except ImportError:
     e = sys.exc_info()[1]
-    Database = None  # PyCharm
-    raise ImproperlyConfigured("Error loading pyodbc module: %s" % e)
+    raise ImproperlyConfigured("Error loading vertica_python module: %s" % e)
 
 from django.db import utils
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseValidation, \
@@ -57,7 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
 
 
-DatabaseError = Database.Error
+DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -265,21 +264,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
             conn_params['port'] = settings_dict['PORT']
-        if not conn_params.get('DRIVER'):
-            from django.core.exceptions import ImproperlyConfigured
-            raise ImproperlyConfigured(
-                "settings.DATABASES['OPTIONS'] must contain DRIVER value. "
-                "Please supply Vertica ODBC Driver name from odbc.ini"
-            )
         return conn_params
 
     def get_new_connection(self, conn_params):
-        dsn = ';'.join("%s=%s" % (k.upper(), str(v)) for k, v in conn_params.items() if v is not None)
-        return Database.connect(dsn)
+        return Database.connect(conn_params)
 
     def _set_autocommit(self, autocommit):
+        mode = "ON" if autocommit else "OFF"
         with self.wrap_database_errors:
-            self.connection.autocommit = autocommit
+            self.connection.query("SET SESSION AUTOCOMMIT TO %s" % mode)
 
     def create_cursor(self):
         cursor = self.connection.cursor()
