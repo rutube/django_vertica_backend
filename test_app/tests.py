@@ -2,6 +2,7 @@
 
 # $Id: $
 from django import VERSION
+from django.db import transaction
 
 import mock
 from django.db.models import Sum
@@ -35,7 +36,9 @@ class VerticaBackendTestCase(TestCase):
 
     def setUp(self):
         self.cursor_mock = mock.MagicMock()
-        self.connect_patcher = mock.patch.object(Database, 'connect')
+        self.connect_mock = mock.MagicMock()
+        self.connect_patcher = mock.patch.object(Database, 'connect',
+                                                 return_value=self.connect_mock)
         self.connect_patcher.start()
         self.cursor_patcher = mock.patch.object(DatabaseWrapper, 'cursor',
                                                 return_value=self.cursor_mock)
@@ -83,3 +86,10 @@ class VerticaBackendTestCase(TestCase):
         query += ('GROUP BY "reports_platformreport"."platform_id" '
                   'LIMIT 400 OFFSET 100')
         self.cursor_mock.execute.assert_called_with(query, (u'2014-09-15',))
+
+    def testAutocommit(self):
+        from django.db import connection
+        connection.set_autocommit(False)
+        self.connect_mock.query.assert_called_with('SET SESSION AUTOCOMMIT TO OFF')
+        connection.set_autocommit(True)
+        self.connect_mock.query.assert_called_with('SET SESSION AUTOCOMMIT TO ON')
