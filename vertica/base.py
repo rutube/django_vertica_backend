@@ -148,7 +148,6 @@ class CursorWrapper(object):
         params = self.format_params(params)
         self.last_params = params
         try:
-            print(sql, params)
             return self.cursor.execute(sql, params)
         except IntegrityError:
             e = sys.exc_info()[1]
@@ -218,19 +217,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     operators = {
         'exact': '= %s',
-        'iexact': 'LIKE %s',
-        'contains': 'LIKE BINARY %s',
-        'icontains': 'LIKE %s',
+        'iexact': 'ILIKE %s',
+        'contains': 'LIKE %s',
+        'icontains': 'ILIKE %s',
         'regex': 'REGEXP BINARY %s',
         'iregex': 'REGEXP %s',
         'gt': '> %s',
         'gte': '>= %s',
         'lt': '< %s',
         'lte': '<= %s',
-        'startswith': 'LIKE BINARY %s',
-        'endswith': 'LIKE BINARY %s',
-        'istartswith': 'LIKE %s',
-        'iendswith': 'LIKE %s',
+        'startswith': 'LIKE %s',
+        'endswith': 'LIKE %s',
+        'istartswith': 'ILIKE %s',
+        'iendswith': 'ILIKE %s',
     }
 
     def __init__(self, *args, **kwargs):
