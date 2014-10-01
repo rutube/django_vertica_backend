@@ -72,6 +72,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name  # Quoting once is enough.
         return '"%s"' % name
 
+    def last_insert_id(self, cursor, table_name, pk_name):
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        return cursor.fetchone()[0]
+
 
 class DatabaseClient(BaseDatabaseClient):
     pass
