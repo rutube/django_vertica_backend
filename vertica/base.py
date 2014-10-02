@@ -72,6 +72,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name  # Quoting once is enough.
         return '"%s"' % name
 
+    def last_insert_id(self, cursor, table_name, pk_name):
+        cursor.execute("SELECT LAST_INSERT_ID()")
+        return cursor.fetchone()[0]
+
 
 class DatabaseClient(BaseDatabaseClient):
     pass
@@ -106,16 +110,6 @@ class CursorWrapper(object):
             # Older FreeTDS (and other ODBC drivers?) don't support Unicode yet, so
             # we need to encode the SQL clause itself in utf-8
             sql = sql.encode('utf-8')
-        # pyodbc uses '?' instead of '%s' as parameter placeholder.
-        if n_params is not None:
-            try:
-                sql = sql % tuple('?' * n_params)
-            except:
-                #Todo checkout whats happening here
-                pass
-        else:
-            if '%s' in sql:
-                sql = sql.replace('%s', '?')
         return sql
 
     def format_params(self, params):
