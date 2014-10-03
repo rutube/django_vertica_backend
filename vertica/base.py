@@ -73,7 +73,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '"%s"' % name
 
     def last_insert_id(self, cursor, table_name, pk_name):
-        cursor.execute("SELECT LAST_INSERT_ID()")
+        cursor.execute("SELECT currval('%s_seq')" % table_name)
         return cursor.fetchone()[0]
 
 
