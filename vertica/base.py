@@ -84,7 +84,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute("SELECT ANALYZE_CONSTRAINTS(%s)", [table_name])
         if cursor.rowcount > 0:
             raise utils.IntegrityError('Constraints failed',
-                                       list(cursor.fetchall()))
+                                       {"row_count": cursor.rowcount,
+                                        "first_row": cursor.fetchone()})
 
 
 class DatabaseClient(BaseDatabaseClient):
