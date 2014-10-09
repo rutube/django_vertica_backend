@@ -2,9 +2,9 @@
 
 # $Id: $
 from django import VERSION
-from django.db import transaction
 
 import mock
+from django.db import utils
 from django.db.models import Sum
 from django.test import TestCase
 from django.test.simple import DjangoTestSuiteRunner
@@ -26,7 +26,6 @@ class VerticaTestRunner(DjangoTestSuiteRunner):
 
 
 class VerticaBackendTestCase(TestCase):
-
 
     def _fixture_setup(self):
         pass
@@ -93,3 +92,14 @@ class VerticaBackendTestCase(TestCase):
         self.connect_mock.query.assert_called_with('SET SESSION AUTOCOMMIT TO OFF')
         connection.set_autocommit(True)
         self.connect_mock.query.assert_called_with('SET SESSION AUTOCOMMIT TO ON')
+
+    def testIntegrityError(self):
+
+        def violate_primary_key(query, params):
+            if "analyze_constraints" in query.lower():
+                self.cursor_mock.rowcount = 1
+
+        self.cursor_mock.execute.side_effect = violate_primary_key
+
+        self.assertRaises(utils.IntegrityError,
+                          PlatformReport.objects.create, id=1)

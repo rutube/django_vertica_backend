@@ -27,6 +27,7 @@ if VERSION >= (1, 7, 0):
     class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         pass
 
+
 class DatabaseCreation(BaseDatabaseCreation):
     data_types = {
         'AutoField': 'identity',
@@ -55,14 +56,17 @@ class DatabaseCreation(BaseDatabaseCreation):
     }
 
 
-
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     pass
 
+
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "vertica.compiler"
+
     def max_name_length(self):
         # :see https://my.vertica.com/docs/4.1/HTML/Master/10538.htm
         return 128
@@ -75,6 +79,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def last_insert_id(self, cursor, table_name, pk_name):
         cursor.execute("SELECT currval('%s_seq')" % table_name)
         return cursor.fetchone()[0]
+
+    def validate_constraints(self, cursor, table_name):
+        cursor.execute("SELECT ANALYZE_CONSTRAINTS(%s)", [table_name])
+        if cursor.rowcount > 0:
+            raise utils.IntegrityError('Constraints failed',
+                                       {"row_count": cursor.rowcount,
+                                        "first_row": cursor.fetchone()})
 
 
 class DatabaseClient(BaseDatabaseClient):
@@ -277,8 +288,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
         return DatabaseSchemaEditor(self, *args, **kwargs)
-
-
-
-
-
