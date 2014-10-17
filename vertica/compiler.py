@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.conf import settings
+from django.db.transaction import atomic
 from django.db.models.sql.compiler import *
 
 # Vertica doesn't validate constraints when data are loaded into a table.
@@ -11,6 +12,7 @@ ENFORCE_CONSTRAINTS_VALIDATION = getattr(settings, "ENFORCE_CONSTRAINTS_VALIDATI
 
 class SQLInsertCompiler(SQLInsertCompiler):
 
+    @atomic
     def execute_sql(self, return_id=False):
         result = super(SQLInsertCompiler, self).execute_sql(return_id)
 

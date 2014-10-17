@@ -288,3 +288,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
         return DatabaseSchemaEditor(self, *args, **kwargs)
+
+    def is_usable(self):
+        try:
+            self.connection.cursor().execute("SELECT 1")
+        except DatabaseError:
+            return False
+        else:
+            return True
