@@ -12,6 +12,8 @@ ENFORCE_CONSTRAINTS_VALIDATION = getattr(settings, "ENFORCE_CONSTRAINTS_VALIDATI
 
 class SQLInsertCompiler(SQLInsertCompiler):
 
+    # We'll need to rollback insert sql if validate_constarints raises an
+    # IntegrityError. So atomic decorator is necessary.
     @atomic
     def execute_sql(self, return_id=False):
         result = super(SQLInsertCompiler, self).execute_sql(return_id)

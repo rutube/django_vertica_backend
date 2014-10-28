@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-vertica-backend',
-    version='0.1',
+    version='0.1.3',
     packages=['vertica'],
     url='https://github.com/tumb1er/django_vertica_backend',
     license='Beer license',
@@ -12,5 +12,4 @@ setup(
     install_requires=[
         'vertica-python'
     ]
-
 )
