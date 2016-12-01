@@ -1,1 +1,1 @@
-vertica-python
+vertica-python==0.3.0
