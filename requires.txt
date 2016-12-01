@@ -1,1 +1,1 @@
-https://github.com/rutube/vertica-python/archive/master.zip
+vertica-python==0.3.0
