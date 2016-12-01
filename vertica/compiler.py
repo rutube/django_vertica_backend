@@ -14,7 +14,7 @@ class SQLInsertCompiler(SQLInsertCompiler):
 
     def execute_sql(self, return_id=False):
         # We'll need to rollback insert sql if validate_constarints raises an
-        # IntegrityError. So atomic decorator is necessary.
+        # IntegrityError. So atomic is necessary.
         with atomic(using=self.using):
             result = super(SQLInsertCompiler, self).execute_sql(return_id)
 

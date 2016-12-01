@@ -8,8 +8,8 @@ env:
 
 # command to install dependencies
 install:
-  - pip install -r requires.txt --use-mirrors
-  - pip install Django==$DJANGO_VERSION --use-mirrors
+  - pip install -r requires.txt
+  - pip install Django==$DJANGO_VERSION
 
 # command to run tests
 script:  python manage.py test test_app
